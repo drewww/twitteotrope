@@ -58,7 +58,7 @@ class AnimationFrameGenerator
 end
 
 # frame generator classes
-require 'color_shifter'
+# require 'color_shifter'
 
 CRLF = "\r\n"
 
@@ -166,15 +166,60 @@ class App
     end
     
     def process_command
-      # TO DO - do whatever this app does
 
       begin
-        twitter_config = YAML.load(IO.read('twitter.yml'))
+        oauth_config = YAML.load(IO.read('app_credentials.yml'))
       rescue
-        puts "You must have a twitter.yml file present with twitter login info."
+        puts "Missing 'oauth.yml' file with consumer key and secret."
+        return
+      end
+      
+
+      consumer=OAuth::Consumer.new oauth_config["key"], 
+                                   oauth_config["secret"], 
+                                   {:site=>"https://api.twitter.com"}
+
+      begin
+        twitter_auth = YAML.load(IO.read('user_credentials.yml'))
+        token_hash = {:token => twitter_auth["oauth_token"],
+                      :secret => twitter_auth["oauth_token_secret"]}
+        access_token = OAuth::AccessToken.from_hash(consumer, token_hash)
+      rescue
+        
+        # If the load fails, we need to start the oob auth process. 
+        # 1. Hit this url: https://api.twitter.com/oauth/request_token?oauth_callback=oob
+        # 2. Take the request_token and construct a new URL: http://api.twitter.com/oauth/authorize?oauth_token=request_token
+        # 3. Show that URL to the user and ask them to C&P it into a browser
+        # 4. Prompt for them to enter the PIN
+        # 5. POST (?) the PIN here: https://api.twitter.com/oauth/access_token 
+        
+        request_token = consumer.get_request_token(:oauth_callback => "oob")
+        
+        puts "Load this URL in a browser: " + request_token.authorize_url
+        print "Enter PIN: "
+        pin = gets.chomp
+        
+        access_token = request_token.get_access_token(:oauth_verifier => pin)
+        
+        f = File.open("user_credentials.yml", 'w')
+        f.write(YAML.dump(
+            {:token => access_token.token,
+             :secret => access_token.secret}))
+        f.close
       end
 
-      puts "loaded twitter info for #{twitter_config["username"]}"
+      # we come out of this block with access_token for sure having what we 
+      # need to run future requests.
+
+      # begin
+      #   twitter_config = YAML.load(IO.read('twitter.yml'))
+      # rescue
+      #   puts "You must have a twitter.yml file present with twitter login info."
+      # end
+
+      # Need to figure out how to pull this from access_token but I'm a ruby
+      # retard.
+      # puts "loaded twitter info for #{twitter_config["username"]}"
 
       frame_generator = ColorShiftFrameGenerator.new()
       
