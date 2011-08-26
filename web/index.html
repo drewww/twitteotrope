@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<title>twitteotrope proof of concept test</title>
+	<style type="text/css" media="screen">
+		#container
+		{
+			width: 600px;
+			
+			padding-left: 10px;
+			padding-right: 10px;
+			margin-left: auto;
+			margin-right: auto;
+		}
+		
+		body
+		{
+			font-family: Helvetica, sans-serif;
+			color: #222222;
+		}
+		
+		h1, h2, h3
+		{
+			font-family: Futura MS, sans-serif;
+			color: #555555;
+			margin-bottom: 0.0em;
+		}
+		
+		#footer
+		{
+			width: 100%;
+			background-color: #8B0272;
+			color: #eeeeee;
+			padding: 5px;
+			padding-bottom: 5px;
+			height: 1.0em;
+		}
+		
+		#footer .right
+		{
+			float: right;
+			width: 300px;
+			text-align: right;
+		}
+		
+		#footer .left
+		{
+			float: left;
+			width: 300px;
+		}
+	</style>
+</head>
+<body id="st-and-d_template" onload="">
+
+<div id="container">
+
+<h1>Twitteotrope Test</h1>
+
+<p>I'm playing around with a system that would update twitter profile images programmatically. This could be used for running long form animations on your profile image, or perhaps overlaying your default profile picture with some sort of presence or mood or weather data. Updating profile pictures takes place instantly on Twitter's main site, but third party clients update the profile pictures at radically different (and unspecified) rates. Before I sink too much time into this, I wanted to see what predominant client behavior was. If they don't update often enough (Tweetie, for instance, updates only on client restarts) it's not really worth doing. I'm interested in both desktop apps and mobile apps of all kinds.</p>
+
+<p>Thanks so much for your help!</p>
+
+<p>Drew</p>
+
+<h2>Instructions</h2>
+<ol>
+	<li>Follow <a href="http://twitter.com/twitteotrope">twitteotrope</a>.</li>
+	<li>Notice the account's profile icon. The first number is the day of the month, the bottom numbers are the time of day that the image was updated. The background color changes slowly over time (and will help you notice when the image has changed). It moves through all hues over 25 hours.</li>
+	<li>Email me or DM me when you see that image change. The account tweets once an hour (when my computer is awake), and updates its profile picture on every tweet. If you think you did something to cause it to get a new image (eg looked at the account's profile or restarted the client) that's useful data too — every client behaves differently. Please be sure to let me know which client you were using.</li>
+	<li>After you've seen it change once, you can unfollow. Though if you want to keep following, I always appreciate more data about how frequently your twitter client looks for new profile images.</li>
+</ol>
+
+<h2>Results</h2>
+<ul>
+	<li>Tweetie (OS X): updates on client restarts</li>
+	<li>Tweetie (iPhone): haven't seen it update in 3 days of use</li>
+	<li>Twitterfox (OS X): seems to catch all updates on-tweet</li>
+	<li>TwitterGadget (google web-app): updates live</li>
+	<li>TwitterFon (iPhone): hasn't updated in first 3 hours</li>
+	<li>TweetDeck (Air): maintains profile image at the time of tweet (&#9733 for best handling of profile images)</li>
+</ul>
+
+Thanks to <a href="http://twitter.com/surelynotalex">@surelynotalex</a>, <a href="http://twitter.com/terronk">@terronk</a>, <a href="http://twitter.com/kimblem">@kimblem</a>, <a href="http://twitter.com/scd">@scd</a> for helping me compile this!
+
+</div>
+</body>
+</html>
