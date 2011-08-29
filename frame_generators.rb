@@ -4,6 +4,14 @@ require 'RMagick'
 include Magick
 
 
+class AnimationFrameGenerator
+  def get_frame(time)
+    puts "Invalid frame generator. You must use a class that extends this and provides a non-empty implementation."
+    return nil
+  end
+end
+
+
 class ColorShiftFrameGenerator < AnimationFrameGenerator
   
   

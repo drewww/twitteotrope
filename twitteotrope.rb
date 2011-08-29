@@ -49,13 +49,8 @@ require 'net/http'
 require 'yaml'
 require 'cgi'
 
+require 'frame_generators.rb'
 
-class AnimationFrameGenerator
-  def get_frame(time)
-    puts "Invalid frame generator. You must use a class that extends this and provides a non-empty implementation."
-    return nil
-  end
-end
 
 # frame generator classes
 # require 'color_shifter'
@@ -168,22 +163,27 @@ class App
     def process_command
 
       begin
-        oauth_config = YAML.load(IO.read('app_credentials.yml'))
+        consumer_auth = YAML.load(IO.read('app_credentials.yml'))
       rescue
         puts "Missing 'oauth.yml' file with consumer key and secret."
         return
       end
       
 
-      consumer=OAuth::Consumer.new oauth_config["key"], 
-                                   oauth_config["secret"], 
+      consumer=OAuth::Consumer.new consumer_auth["consumer_key"], 
+                                   consumer_auth["consumer_secret"], 
                                    {:site=>"https://api.twitter.com"}
 
       begin
-        twitter_auth = YAML.load(IO.read('user_credentials.yml'))
-        token_hash = {:token => twitter_auth["oauth_token"],
-                      :secret => twitter_auth["oauth_token_secret"]}
+        auth = YAML.load(IO.read('user_credentials.yml'))
+        token_hash = {:token => auth["token"],
+                      :token_secret => auth["token_secret"]}
         access_token = OAuth::AccessToken.from_hash(consumer, token_hash)
+        
+        # I know there's probably a way to merge keys in ruby, but I'm lazy
+        auth[:consumer_key] = consumer_auth["consumer_key"]
+        auth[:consumer_secret] = consumer_auth["consumer_secret"]
+        
       rescue
         
         # If the load fails, we need to start the oob auth process. 
@@ -204,10 +204,19 @@ class App
         f = File.open("user_credentials.yml", 'w')
         f.write(YAML.dump(
             {:token => access_token.token,
-             :secret => access_token.secret}))
+             :token_secret => access_token.secret}))
         f.close
+        
+        # this is silly and gross but whatever. I'm a nub.
+        auth = {}
+        auth[:consumer_key] = consumer_auth["consumer_key"]
+        auth[:consumer_secret] = consumer_auth["consumer_secret"]
+        auth[:token] = access_token.token
+        auth[:token_secret] = access_token.secret
       end
-
+      
+      
+      
       # we come out of this block with access_token for sure having what we 
       # need to run future requests.
 
@@ -223,9 +232,21 @@ class App
 
       frame_generator = ColorShiftFrameGenerator.new()
       
-      puts "Generating frame for time: #{Time.new.to_i}"
+      current_time = Time.new.to_i
+      
+      puts "Generating frame for time: #{current_time}"
 
-      image_file = File.new(frame_generator.get_frame(Time.new.to_i))
+      image = frame_generator.get_frame(current_time)
+      
+      # bounce the produced image off a file
+      # we'll want a flag here eventually that bounce them off tmp so 
+      # they don't accumulate, but for now we can always store them.
+      
+      if image!=nil
+        # write the image to disk
+        image_file = "img/frame_#{current_time}.png"
+        image.write(image_file)
+      end
 
       if image_file==nil
         puts "Frame generator returned a nil image"
@@ -237,11 +258,11 @@ class App
         
         puts "Uploading new profile picture."
         
-        url = URI.parse('http://twitter.com/account/update_profile_image.json')
+        url = URI.parse('https://twitter.com/account/update_profile_image.json')
         Net::HTTP.new(url.host, url.port).start do |http| 
           req = Net::HTTP::Post.new(url.request_uri)
           add_multipart_data(req,:image=>image_file)
-          req.basic_auth twitter_config["username"], twitter_config["password"]
+          add_oauth(req, auth)
         
           res = http.request(req)
         
@@ -301,6 +322,7 @@ end
 
 # TO DO - Add your Modules, Classes, etc
 
+# This code from this gist: https://gist.github.com/97756
 
 #Quick and dirty method for determining mime type of uploaded file
 def mime_type(file)
@@ -332,6 +354,15 @@ def add_multipart_data(req,params)
   body << "--#{boundary}--#{CRLF*2}"
   req.body = body
   req["Content-Length"] = req.body.size
+end
+
+#Uses the OAuth gem to add the signed Authorization header
+def add_oauth(req, auth)
+  consumer = OAuth::Consumer.new(
+    auth[:consumer_key],auth[:consumer_secret],{:site=>'https://twitter.com'}
+  )
+  access_token = OAuth::AccessToken.new(consumer,auth[:token],auth[:token_secret])
+  consumer.sign!(req,access_token)
 end
 
 
