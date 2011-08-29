@@ -1,1 +1,6 @@
+# Excludes configuration files.
 *.yml
+
+# Excludes generated frames in the img directory.
+img/*.png
+
