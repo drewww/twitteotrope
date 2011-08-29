@@ -54,9 +54,9 @@ class ColorShiftFrameGenerator < AnimationFrameGenerator
     # text.text(10, 10, full_time.strftime("%d"))
     # text.text(10, 30, full_time.strftime("%H.%M"))
 
-    filename = "frame_#{time}.png"
-    image.write(filename)
+    # filename = "frame_#{time}.png"
+    # image.write(filename)
     
-    return filename
+    return image
   end
 end
