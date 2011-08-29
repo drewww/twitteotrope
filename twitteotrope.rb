@@ -170,9 +170,9 @@ class App
       end
       
 
-      consumer=OAuth::Consumer.new consumer_auth["consumer_key"], 
-                                   consumer_auth["consumer_secret"], 
-                                   {:site=>"https://api.twitter.com"}
+      consumer=OAuth::Consumer.new consumer_auth[:consumer_key], 
+                                   consumer_auth[:consumer_secret], 
+                                   {:site=>"http://api.twitter.com"}
 
       begin
         auth = YAML.load(IO.read('user_credentials.yml'))
@@ -181,8 +181,8 @@ class App
         access_token = OAuth::AccessToken.from_hash(consumer, token_hash)
         
         # I know there's probably a way to merge keys in ruby, but I'm lazy
-        auth[:consumer_key] = consumer_auth["consumer_key"]
-        auth[:consumer_secret] = consumer_auth["consumer_secret"]
+        auth[:consumer_key] = consumer_auth[:consumer_key]
+        auth[:consumer_secret] = consumer_auth[:consumer_secret]
         
       rescue
         
@@ -208,9 +208,7 @@ class App
         f.close
         
         # this is silly and gross but whatever. I'm a nub.
-        auth = {}
-        auth[:consumer_key] = consumer_auth["consumer_key"]
-        auth[:consumer_secret] = consumer_auth["consumer_secret"]
+        auth = consumer_auth.clone
         auth[:token] = access_token.token
         auth[:token_secret] = access_token.secret
       end
@@ -258,7 +256,7 @@ class App
         
         puts "Uploading new profile picture."
         
-        url = URI.parse('https://twitter.com/account/update_profile_image.json')
+        url = URI.parse('http://twitter.com/account/update_profile_image.json')
         Net::HTTP.new(url.host, url.port).start do |http| 
           req = Net::HTTP::Post.new(url.request_uri)
           add_multipart_data(req,:image=>image_file)
@@ -312,7 +310,7 @@ class App
 
         if @options.verbose
           puts "Tweeting successful! Full response:"
-          puts res.body if @options.verbose 
+          puts res.body
         end
         
       end
@@ -359,7 +357,7 @@ end
 #Uses the OAuth gem to add the signed Authorization header
 def add_oauth(req, auth)
   consumer = OAuth::Consumer.new(
-    auth[:consumer_key],auth[:consumer_secret],{:site=>'https://twitter.com'}
+    auth[:consumer_key],auth[:consumer_secret],{:site=>'http://twitter.com'}
   )
   access_token = OAuth::AccessToken.new(consumer,auth[:token],auth[:token_secret])
   consumer.sign!(req,access_token)
