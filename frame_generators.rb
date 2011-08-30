@@ -8,12 +8,17 @@ HEIGHT = 200
 
 class AnimationFrameGenerator
 
-  def initialize    
-    begin
-      @state = YAML.load(IO.read(self.class.name + ".yml"))
-    rescue
-      puts "Initializing frame generator defaults."
+  def initialize(force=false)
+    
+    if force
       set_defaults()
+    else
+      begin
+        @state = YAML.load(IO.read(self.class.name + ".yml"))
+      rescue
+        puts "Initializing frame generator defaults."
+        set_defaults()
+      end
     end
   end
     
@@ -45,8 +50,8 @@ end
 
 class GradientShiftFrameGenerator < AnimationFrameGenerator
   
-  def initialize
-    super
+  def initialize(force=false)
+    super(force)
   end
   
   def set_defaults
@@ -54,7 +59,7 @@ class GradientShiftFrameGenerator < AnimationFrameGenerator
     @state[:start_time] = Time.new.to_i
     
     # repeat on a one day period
-    @state[:period] = 60*60*24
+    @state[:period] = 60*60*24*30
     super
   end
   

@@ -51,6 +51,8 @@ require 'cgi'
 
 require 'frame_generators.rb'
 
+require 'RMagick'
+include Magick
 
 # frame generator classes
 # require 'color_shifter'
@@ -72,7 +74,10 @@ class App
     @options.quiet = false
     @options.pretend = false
     @options.gif = false
+    @options.gif_duration = 60*60*24*30
+    @options.gif_steps = 60
     @options.set_status = false
+    @options.status = false
     # TO DO - add additional defaults
   end
 
@@ -111,8 +116,28 @@ class App
         @options.set_status = true
         @options.status = status
       end
+
+      opts.on('g', '--gif')         { @options.gif = true}
         
-      opts.on('-g', '--gif')
+      # opts.on('-g', '--gif [steps,duration_in_days]') do |gif_options|
+      #   @options.gif = true
+      #   
+      #   puts "gif_options: " + gif_options
+      #   
+      #   if gif_options == nil
+      #     @options.gif_duration = 60*60*24*30
+      #     @options.gif_steps = 60
+      #   end
+      #   
+      #   gif_options_list = gif_options.split(",")
+      #   @options.gif_steps=gif_options_list[0]
+      #   if gif_options_list.length > 1
+      #     @options.gif_duration = gif_options_list[1].to_i*60*60*24
+      #   else
+      #     @options.gif_duration = 60*60*24*30
+      #   end
+      # end
+        
       # TO DO - add additional options
             
       opts.parse!(@arguments) rescue return false
@@ -161,6 +186,26 @@ class App
     end
     
     def process_command
+
+      if @options.gif
+        # If we're doing gif generation, it's going to be a totally different
+        # flow from usual. Just loop through the images and accumulate an
+        # ImageList.
+        image_list = ImageList.new()
+        frame_generator = GradientShiftFrameGenerator.new(true)
+        start_time = Time.new.to_i
+        cur_time = Time.new.to_i
+        
+        for i in 0..@options.gif_steps
+          image_list << frame_generator.get_frame(cur_time)
+          
+          cur_time = cur_time + @options.gif_duration/@options.gif_steps
+        end
+        
+        image_list.write("img/animated_#{start_time}.gif")
+        return
+      end
+
 
       begin
         consumer_auth = YAML.load(IO.read('app_credentials.yml'))
