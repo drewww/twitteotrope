@@ -221,7 +221,8 @@ class App
       # retard.
       # puts "loaded twitter info for #{twitter_config["username"]}"
       
-      frame_generator = ColorShiftFrameGenerator.new()
+      # frame_generator = ColorShiftFrameGenerator.new()
+      frame_generator = GradientShiftFrameGenerator.new()
       
       current_time = Time.new.to_i
       

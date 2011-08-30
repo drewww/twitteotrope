@@ -3,13 +3,80 @@ require 'RMagick'
 
 include Magick
 
+WIDTH = 200
+HEIGHT = 200
 
 class AnimationFrameGenerator
+
+  def initialize    
+    begin
+      @state = YAML.load(IO.read(self.class.name + ".yml"))
+    rescue
+      set_defaults()
+    end
+  end
+    
+  def set_defaults
+    # override this method if you have important defaults.
+    
+    self.write_state
+  end
+  
+  def write_state
+    File.open(self.class.name + ".yml", 'w') do |f|
+      f.write(YAML.dump(@state))
+      f.close
+    end
+  end
+
   def get_frame(time)
     puts "Invalid frame generator. You must use a class that extends this and provides a non-empty implementation."
     return nil
   end
 end
+
+# Some ideas:
+# 1. Pan through an image. Either bounce off edges or wrap around. 
+# 2. Scroll text 
+# 3. Unspool an animated gif
+# 4. Move through a gradient space.
+
+
+class GradientShiftFrameGenerator < AnimationFrameGenerator
+  
+  def initialize
+    super
+  end
+  
+  def set_defaults
+    @state = {}
+    @state[:start_time] = Time.new.to_i
+    
+    # repeat on a one day period
+    @state[:period] = 60*60*24
+    super
+  end
+  
+  
+  def get_frame(time)
+    
+    # figures out where we are within the period (normalized)
+    hue_normalized = ((time % @state[:period]) / @state[:period])
+    hue_lower = (hue_normalized-0.02)*360
+    hue_upper = (hue_normalized+0.02)*360
+    
+    grad = GradientFill.new(0, 0, WIDTH, 0, "hsl(#{hue_upper}, 41, 69)",
+      "hsl(#{hue_lower}, 41, 69)")
+    
+    puts "hue_normalized: #{hue_normalized}"
+    
+    frame = Image.new(WIDTH, HEIGHT, grad)
+    
+    return frame
+  end
+  
+end
+
 
 
 class ColorShiftFrameGenerator < AnimationFrameGenerator
@@ -67,4 +134,5 @@ class ColorShiftFrameGenerator < AnimationFrameGenerator
     
     return image
   end
+  
 end
