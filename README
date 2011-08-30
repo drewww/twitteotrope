@@ -1,0 +1,6 @@
+twitteotrope - a commandline tool for animating a Twitter profile picture
+=========================================================================
+
+This tool provides a structure for designing automatically-updating Twitter profile images. These animations can either be pre-determined or could be data driven. 
+
+Right now, the code is kind of a mess. I'm just building out the pieces that will make it all work and starting to accumulate a portfolio of different kinds of designs. More later on how to install + run it, how to write your own frame generators, etc. 
