@@ -12,6 +12,7 @@ class AnimationFrameGenerator
     begin
       @state = YAML.load(IO.read(self.class.name + ".yml"))
     rescue
+      puts "Initializing frame generator defaults."
       set_defaults()
     end
   end
@@ -59,11 +60,12 @@ class GradientShiftFrameGenerator < AnimationFrameGenerator
   
   
   def get_frame(time)
+    puts "start_time: #{@state[:start_time]}  cur_time: #{time} -: #{time - @state[:start_time]}"
     
     # figures out where we are within the period (normalized)
-    hue_normalized = ((time % @state[:period]) / @state[:period])
-    hue_lower = (hue_normalized-0.02)*360
-    hue_upper = (hue_normalized+0.02)*360
+    hue_normalized = (((time - @state[:start_time]) % @state[:period]) / @state[:period].to_f)
+    hue_lower = (hue_normalized-0.05)*360
+    hue_upper = (hue_normalized+0.05)*360
     
     grad = GradientFill.new(0, 0, WIDTH, 0, "hsl(#{hue_upper}, 41, 69)",
       "hsl(#{hue_lower}, 41, 69)")
