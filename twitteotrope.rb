@@ -217,26 +217,16 @@ class App
       end
       
       
-      
-      # we come out of this block with access_token for sure having what we 
-      # need to run future requests.
-
-      # begin
-      #   twitter_config = YAML.load(IO.read('twitter.yml'))
-      # rescue
-      #   puts "You must have a twitter.yml file present with twitter login info."
-      # end
-
       # Need to figure out how to pull this from access_token but I'm a ruby
       # retard.
       # puts "loaded twitter info for #{twitter_config["username"]}"
-
+      
       frame_generator = ColorShiftFrameGenerator.new()
       
       current_time = Time.new.to_i
       
       puts "Generating frame for time: #{current_time}"
-
+      
       image = frame_generator.get_frame(current_time)
       
       # bounce the produced image off a file
