@@ -45,7 +45,11 @@ end
 # 1. Pan through an image. Either bounce off edges or wrap around. 
 # 2. Scroll text 
 # 3. Unspool an animated gif
-# 4. Move through a gradient space.
+# 4. Move through a gradient space. √
+# 5. Data driven options
+#       - a small bar chart of tweet frequency, sparkline style
+#       - weather for the day in your location
+#       - sports scores?
 
 
 class GradientShiftFrameGenerator < AnimationFrameGenerator
