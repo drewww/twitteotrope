@@ -165,7 +165,7 @@ class App
       begin
         consumer_auth = YAML.load(IO.read('app_credentials.yml'))
       rescue
-        puts "Missing 'app_credentials.yml' file with consumer key and secret."
+        puts "Missing 'app_credentials.yml' file with consumer key and secret." unless @options.quiet
         return
       end
       
@@ -225,7 +225,7 @@ class App
       
       current_time = Time.new.to_i
       
-      puts "Generating frame for time: #{current_time}"
+      puts "Generating frame for time: #{current_time}" unless @options.quiet
       
       image = frame_generator.get_frame(current_time)
       
@@ -240,7 +240,7 @@ class App
       end
 
       if image_file==nil
-        puts "Frame generator returned a nil image"
+        puts "Frame generator returned a nil image" unless @options.quiet
         return
       end
 
@@ -342,7 +342,7 @@ class App
         add_multipart_data(req,:image=>image_file)
         add_oauth(req)
         res = http.request(req)
-        puts res.body
+        puts res.body if @options.verbose
       end
     end
     
