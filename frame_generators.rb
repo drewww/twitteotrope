@@ -7,6 +7,7 @@ WIDTH = 200
 HEIGHT = 200
 
 class AnimationFrameGenerator
+  @@info = "A generic frame generator. Do not use."
 
   def initialize(force=false)
     
@@ -39,6 +40,11 @@ class AnimationFrameGenerator
     puts "Invalid frame generator. You must use a class that extends this and provides a non-empty implementation."
     return nil
   end
+  
+  def self.info
+    return @@info
+  end
+  
 end
 
 # Some ideas:
@@ -53,6 +59,7 @@ end
 
 
 class GradientShiftFrameGenerator < AnimationFrameGenerator
+  @@info = "Changes hue over time, with a slight gradient effect."
   
   def initialize(force=false)
     super(force)
@@ -91,7 +98,7 @@ end
 
 
 class ColorShiftFrameGenerator < AnimationFrameGenerator
-  
+  @@info = "Changes hue over a period of time."
   
   def initialize
     # the number of seconds to go through the entire hue cycle

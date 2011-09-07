@@ -26,13 +26,12 @@
 #   -v, --version           Display the version, then exit
 #   -q, --quiet             Output as little as possible, overrides verbose
 #   -V, --verbose           Verbose output
-#   TODO - add additional options
 #
 # == Author
 #   Drew Harry
 #
 # == Copyright
-#   Copyright (c) 2009 Drew Harry. 
+#   Copyright (c) 2011 Drew Harry. 
 #   TODO add license
 
 # cli structure requirements
@@ -90,7 +89,9 @@ class App
       
       output_options if @options.verbose # [Optional]
             
-      process_arguments            
+      if process_arguments == false
+        return
+      end
       process_command
       
       puts "\nFinished at #{DateTime.now}" if @options.verbose
@@ -118,7 +119,9 @@ class App
       end
 
       opts.on('g', '--gif')         { @options.gif = true}
-        
+      
+      # These are fancier gif options, but had trouble getting the
+      # OptionParser to handle them properly. Not critical.
       # opts.on('-g', '--gif [steps,duration_in_days]') do |gif_options|
       #   @options.gif = true
       #   
@@ -137,8 +140,6 @@ class App
       #     @options.gif_duration = 60*60*24*30
       #   end
       # end
-        
-      # TO DO - add additional options
             
       opts.parse!(@arguments) rescue return false
       
@@ -168,8 +169,27 @@ class App
     
     # Setup the arguments
     def process_arguments
-      # TO DO - place in local vars, etc
-      # not sure what I do here versus in the opts setup blocks thing
+      # at this point, @arguments just has the stuff after all the options
+      # have been parsed. The main option here is which frame generator
+      # are we going to use.
+      
+      generator_name = @arguments[0]
+      
+      
+      generators = {"gradient"=>GradientShiftFrameGenerator,
+        "color"=>ColorShiftFrameGenerator}
+      
+      
+      if(generators.keys.include? generator_name)
+        @generator = generators[generator_name].new
+      else
+        puts "'#{generator_name}' is not a valid style. Valid options are:"
+        generators.keys.each do |key|
+          puts "\t#{key} - " + generators[key].info
+        end
+        return false
+      end
+      return true
     end
     
     def output_help
@@ -192,12 +212,12 @@ class App
         # flow from usual. Just loop through the images and accumulate an
         # ImageList.
         image_list = ImageList.new()
-        frame_generator = GradientShiftFrameGenerator.new(true)
+
         start_time = Time.new.to_i
         cur_time = Time.new.to_i
         
         for i in 0..@options.gif_steps
-          image_list << frame_generator.get_frame(cur_time)
+          image_list << @generator.get_frame(cur_time)
           
           cur_time = cur_time + @options.gif_duration/@options.gif_steps
         end
@@ -266,14 +286,14 @@ class App
       # retard.
       # puts "loaded twitter info for #{twitter_config["username"]}"
       
-      # frame_generator = ColorShiftFrameGenerator.new()
-      frame_generator = GradientShiftFrameGenerator.new()
+
       
       current_time = Time.new.to_i
       
       puts "Generating frame for time: #{current_time}" unless @options.quiet
-      
-      image = frame_generator.get_frame(current_time)
+
+      # The generator is set in process_arguments.
+      image = @generator.get_frame(current_time)
       
       # bounce the produced image off a file
       # we'll want a flag here eventually that bounce them off tmp so 
