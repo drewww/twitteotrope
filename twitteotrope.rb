@@ -265,7 +265,7 @@ class App
       
         puts "Load this URL in a browser: " + request_token.authorize_url
         print "Enter PIN: "
-        pin = gets.chomp
+        pin = STDIN.gets.chomp
       
         access_token = request_token.get_access_token(:oauth_verifier => pin)
       
