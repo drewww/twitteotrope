@@ -90,6 +90,26 @@ class GradientShiftFrameGenerator < AnimationFrameGenerator
     
     frame = Image.new(WIDTH, HEIGHT, grad)
     
+    # now make a new image with a rounded rect and mask the original one.
+    # mask = Image.new(WIDTH, HEIGHT) {self.background_color = "rgb(0,0,0)"}
+    # mask.format = "jpg"
+    
+    # gc = Draw.new
+    # # gc.fill_opacity(1)
+    # # gc.fill("rgb(0,0,0)")
+    # # gc.rectangle(0,0,WIDTH,HEIGHT)
+    # 
+    # gc.fill("white")
+    # gc.stroke("white")
+    # gc.roundrectangle(0,0,WIDTH,HEIGHT,20,20)
+    # gc.draw(mask)
+    # 
+    # mask.write("mask.jpg")
+    # 
+    # # frame = frame.mask(mask)
+    # 
+    # frame.composite!(mask, 0, 0, OutCompositeOp)
+    # frame.write("frame.png")
     return frame
   end
   
